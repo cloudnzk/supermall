@@ -1,5 +1,5 @@
 <template>
-  <div id="category" class="wrapper">分类</div>
+  <div id="category">分类</div>
 </template>
 
 <script>

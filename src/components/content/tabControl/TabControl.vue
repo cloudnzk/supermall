@@ -1,10 +1,12 @@
 <template>
   <div class="tab-control">
        <!-- 只是文字不同，没必要搞插槽了 -->
-    <div v-for="(item,index) in titles" :key="item" 
+    <div v-for="(item,index) in titles" 
+        :key="item" 
        class="tab-control-item" 
-       :class="{active: index===currentIndex}" @click="itemClick(index)">
-           <span>{{item}}</span>
+       :class="{active: index===currentIndex}" 
+       @click="itemClick(index)">
+        <span>{{item}}</span>
     </div>
   </div>
 </template>

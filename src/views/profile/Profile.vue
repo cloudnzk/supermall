@@ -1,5 +1,5 @@
 <template>
-  <div id="profile" class="wrapper">档案</div>
+  <div id="profile">档案</div>
 </template>
 
 <script>

@@ -1,13 +1,25 @@
 <template>
   <div id="home">
     <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
-    <scroll class="content">
+    <!-- 加ref属性是为了获得组件对象 -->
+    <scroll class="content" 
+      ref="scroll" 
+      :probe-type="3" 
+      @scroll="contentScroll"
+      :pull-up-load="true"
+      @pullingUp="loadMore">
         <home-swiper :banners=banners></home-swiper>
         <recommend-view :recommends=recommends></recommend-view>
         <feature-view></feature-view>
-        <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+        <tab-control class="tab-control" 
+          :titles="['流行','新款','精选']" 
+          @tabClick="tabClick">
+        </tab-control>
         <goods-list :goods="showGoods"></goods-list>
     </scroll>
+    <!-- 为什么这里需要用到.native修饰符？ 
+        因为需要监听一个组件的原生事件时，必须加上才能监听-->
+    <back-top @click.native="backClick" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -17,6 +29,7 @@
 
   import TabControl from 'components/content/tabControl/TabControl'
   import GoodsList from 'components/content/goods/GoodsList'
+  import BackTop from 'components/content/backTop/BackTop'
   
   import HomeSwiper from './childComps/HomeSwiper'
   import RecommendView from './childComps/RecommendView'
@@ -34,7 +47,8 @@
       FeatureView,
       TabControl,
       GoodsList,
-      Scroll
+      Scroll,
+      BackTop
     },
     data() {
 
@@ -47,7 +61,8 @@
           'new': {page: 0, list: []},
           'sell': {page: 0, list: []},
         },
-        currentType: 'pop'
+        currentType: 'pop',
+        isShowBackTop: true
       }
     },
     computed: {
@@ -81,6 +96,24 @@
         }
       },
 
+      backClick(){
+        this.$refs.scroll.scrollTo(0,0)
+      },
+      
+      contentScroll(position){
+        // console.log(position);
+        this.isShowBackTop = -position.y > 1000
+      },
+      
+      loadMore(){
+        // console.log('上拉加载更多');
+        // 上拉加载请求数据
+        this.getHomeGoods(this.currentType)
+
+        // 图片异步加载完后，刷新可滚动区域的高度
+        this.$refs.scroll.scroll.refresh()
+      },
+
 
       /**
        * 网络请求相关的方法
@@ -101,6 +134,9 @@
           // 如何将一个数组的内容添加到另一个数组中
           this.goods[type].list.push(...res.data.data.list)
           this.goods[type].page += 1
+
+          // 完成加载更多，允许多次上拉加载
+          this.$refs.scroll.finishPullUp()
         })
       }
     }

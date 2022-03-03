@@ -1,5 +1,5 @@
 <template>
-  <div id="cart" class="wrapper">购物车</div>
+  <div id="cart">购物车</div>
 </template>
 
 <script>
