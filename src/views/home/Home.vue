@@ -1,80 +1,20 @@
 <template>
   <div id="home">
-    <nav-bar class="home-nav">
-      <div slot="center">购物街</div>
-    </nav-bar>
-    <home-swiper :banners=banners></home-swiper>
-    <recommend-view :recommends=recommends></recommend-view>
-    <feature-view></feature-view>
-    <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
-    <goods-list :goods="showGoods"></goods-list>
-    <ul>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-      <li>列表1</li>
-      <li>列表2</li>
-      <li>列表3</li>
-      <li>列表4</li>
-      <li>列表5</li>
-      <li>列表6</li>
-      <li>列表7</li>
-      <li>列表8</li>
-      <li>列表9</li>
-      <li>列表10</li>
-    </ul>
+    <nav-bar class="home-nav"><div slot="center">购物街</div></nav-bar>
+    <scroll class="content">
+        <home-swiper :banners=banners></home-swiper>
+        <recommend-view :recommends=recommends></recommend-view>
+        <feature-view></feature-view>
+        <tab-control class="tab-control" :titles="['流行','新款','精选']" @tabClick="tabClick"></tab-control>
+        <goods-list :goods="showGoods"></goods-list>
+    </scroll>
   </div>
 </template>
 
 <script>
   import NavBar from 'components/common/navbar/NavBar'
+  import Scroll from 'components/common/scroll/Scroll'
+
   import TabControl from 'components/content/tabControl/TabControl'
   import GoodsList from 'components/content/goods/GoodsList'
   
@@ -94,6 +34,7 @@
       FeatureView,
       TabControl,
       GoodsList,
+      Scroll
     },
     data() {
 
@@ -166,26 +107,45 @@
   }
 </script>
 
+<!-- 加了scoped 与没加的区别：加了之后只对本组件起作用。
+      如果其他组件有同样类名的，不起作用-->
 <style scoped>
-  #home{
-    padding-top: 44px;
+  #home {
+    /*padding-top: 44px;*/
+    /* 100% viewpoint视口 */
+    height: 100vh;
+    position: relative;
   }
-  .home-nav{
+
+  .home-nav {
     background-color: var(--color-tint);
     color: #fff;
 
     position: fixed;
     left: 0;
-    top: 0;
     right: 0;
+    top: 0;
     z-index: 9;
   }
-  
-  .tab-control{
-    /* 粘性定位 */
+
+  .tab-control {
     position: sticky;
     top: 44px;
-    /* 变为固定定位后会脱离标准流 */
-    z-index: 20;
+    z-index: 9;
   }
+
+  .content {
+    overflow: hidden;
+    /* 如何指定滚动的区域：即顶部navbar与底部tabbar之间的区域 
+     * (1)定位。现在使用的方法
+     * (2)calc(100%-上下高度之和)
+    */
+    position: absolute;
+    top: 44px;
+    bottom: 49px;
+    left: 0;
+    right: 0;
+  }
+
+  
 </style>
