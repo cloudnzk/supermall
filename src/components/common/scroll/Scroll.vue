@@ -67,6 +67,9 @@
             /* 判断scroll对象存不存在
             *  因为首页的数据有可能加载得很快，this.scroll还没创建好 */
             this.scroll && this.scroll.refresh()
+          },
+          getScrollY(){
+            return this.scroll ? this.scroll.y : 0
           }
         },
     };
