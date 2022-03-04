@@ -31,7 +31,7 @@
 </template>
 
 <script>
-  import NavBar from 'components/common/navbar/NavBar'
+  import NavBar from 'common/navbar/NavBar'
   import Scroll from 'components/common/scroll/Scroll'
 
   import TabControl from 'components/content/tabControl/TabControl'
