@@ -39,23 +39,34 @@
             })
             
             /* 2.监听滚动的位置，on：Better-scroll的API */
-            this.scroll.on('scroll', (position) => {
-              // console.log(position);
-              this.$emit('scroll', position)
-            })
+            if(this.probeType === 2 || this.probeType === 3){
+              this.scroll.on('scroll', (position) => {
+                // console.log(position);
+                this.$emit('scroll', position)
+              })
+            }
             
-            /* 3.监听上拉事件 */
-            this.scroll.on('pullingUp',() => {
-              // console.log('上拉加载更多');
-              this.$emit('pullingUp')
-            })
+            
+            /* 3.监听scroll滚动到底部 */
+            if(this.pullUpLoad){
+              this.scroll.on('pullingUp',() => {
+                // console.log('上拉加载更多');
+                this.$emit('pullingUp')
+              })
+            }
+            
         },
         methods: {
           scrollTo(x,y,time=300){
-            this.scroll.scrollTo(x,y,time)
+            this.scroll && this.scroll.scrollTo(x,y,time)
           },
           finishPullUp(){
             this.scroll.finishPullUp()
+          },
+          refresh(){
+            /* 判断scroll对象存不存在
+            *  因为首页的数据有可能加载得很快，this.scroll还没创建好 */
+            this.scroll && this.scroll.refresh()
           }
         },
     };

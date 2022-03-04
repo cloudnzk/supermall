@@ -37,6 +37,7 @@
 
 
   import {getHomeMultidata,getHomeGoods} from 'network/home'
+  import {debounce} from 'common/utils'
   
   export default {
     name: "Home",
@@ -78,10 +79,21 @@
       this.getHomeGoods('new')
       this.getHomeGoods('sell')
     },
+    mounted(){
+      const refresh = debounce(this.$refs.scroll.refresh,500)
+
+      //3.监听item中图片加载完成
+      this.$bus.$on('itemImageLoad',() => {
+        // this.$refs.scroll.refresh()
+        refresh()
+      })
+    },
+
     methods: {
       /**
        * 事件监听相关的方法
        */
+      //防抖
       tabClick(index){
         switch (index) {
           case 0:
@@ -111,7 +123,7 @@
         this.getHomeGoods(this.currentType)
 
         // 图片异步加载完后，刷新可滚动区域的高度
-        this.$refs.scroll.scroll.refresh()
+        // this.$refs.scroll.scroll.refresh()
       },
 
 
@@ -135,7 +147,7 @@
           this.goods[type].list.push(...res.data.data.list)
           this.goods[type].page += 1
 
-          // 完成加载更多，允许多次上拉加载
+          // 完成上拉加载更多，允许下一次上拉加载
           this.$refs.scroll.finishPullUp()
         })
       }
