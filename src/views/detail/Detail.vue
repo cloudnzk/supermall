@@ -1,11 +1,11 @@
 <template>
     <div id="detail">
         <detail-nav-bar class="detail-nav"></detail-nav-bar>
-        <scroll class="content">
+        <scroll class="content" ref="scroll">
             <detail-swiper :top-images="topImages"></detail-swiper>
             <detail-base-info :goods="goods"></detail-base-info>
             <detail-shop-info :shop="shop"></detail-shop-info>
-            <detail-goods-info :detail-info="detailInfo"></detail-goods-info>
+            <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
             <detail-param-info :param-info="paramInfo"></detail-param-info>
         </scroll>
     </div>
@@ -67,7 +67,11 @@ export default {
         this.paramInfo = new GoodsParam(data.itemParams.info,data.itemParams.rule)
       })
   },
-  methods:{}
+  methods:{
+      imageLoad(){
+          this.$refs.scroll.refresh()
+      }
+  }
 }
 </script>
 <style scoped>
@@ -88,6 +92,6 @@ export default {
     .content {
         /* 设置滚动区域的高度，这里的100%是父元素的高度，所以要指定一个具体的父元素高度 */
         /* calc内要加空格，才能生效 */
-        height: calc(100% - 44px);
+        height: calc(100% - 44px); 
     }
 </style>

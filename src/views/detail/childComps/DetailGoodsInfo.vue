@@ -8,7 +8,7 @@
     </div>
     <div class="info-key">{{detailInfo.detailImage[0].key}}</div>
     <div class="info-list">
-      <img v-for="(item) in detailInfo.detailImage[0].list" :src="item" alt="" :key="item">
+      <img v-for="(item) in detailInfo.detailImage[0].list" :src="item" alt="" :key="item" @load="imgLoad">
     </div>
   </div>
 </template>
@@ -19,6 +19,29 @@
     props: {
       detailInfo: {
         type: Object
+      },
+    },
+    data() {
+      return {
+        counter: 0,
+        imagesLength: 0
+      }
+    },
+    methods: {
+      imgLoad(){
+        // 等图片都加载完了，进行一次回调即可
+        if(++this.counter === this.imagesLength){
+          this.$emit('imageLoad')
+        }
+      }
+    },
+    /* 监听某个属性的变化
+     * 为什么不在上面直接判断？目的是减少detailInfo.detailImage[0].list.length的调用次数
+     */
+    watch: {
+      detailInfo(){
+        // 获取图片的个数，这里只需要调用一次
+        this.imagesLength = this.detailInfo.detailImage[0].list.length
       }
     }
 	}
