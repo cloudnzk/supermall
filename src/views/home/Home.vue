@@ -99,6 +99,7 @@
       })
     },
     
+    /* 保存离开的位置 */
     activated(){
       this.$refs.scroll.scrollTo(0,this.saveY,0)
       this.$refs.scroll.refresh()
@@ -107,7 +108,8 @@
     
     deactivated(){
       // console.log('deactivated')
-      this.saveY = this.$refs.scroll.getScrollY()
+      this.saveY = this.$refs.scroll.getCurrentY()
+      // console.log(this.saveY)
     },
 
     methods: {

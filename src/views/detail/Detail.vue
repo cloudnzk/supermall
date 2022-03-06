@@ -43,8 +43,9 @@ export default {
    }
   },
   created(){
-      // 1.保存传入的iid
-      this.iid = this.$route.params.iid;
+      // 1.保存传入的iid，因为是用query传参，所以要用this.$route.query取出内容
+      // this.iid = this.$route.params.iid;
+      this.iid = this.$route.query.iid;
       
       // 2.根据iid请求详情数据
       getDetail(this.iid).then(res => {

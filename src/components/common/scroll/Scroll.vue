@@ -68,7 +68,7 @@
             *  因为首页的数据有可能加载得很快，this.scroll还没创建好 */
             this.scroll && this.scroll.refresh()
           },
-          getScrollY(){
+          getCurrentY(){
             return this.scroll ? this.scroll.y : 0
           }
         },

@@ -29,7 +29,12 @@ export default {
     },
     itemClick(){
       // console.log('jt');
-      this.$router.push('/detail/' + this.goodsItem.iid)
+      this.$router.push({
+        path: '/detail',
+        query: {
+          iid: this.goodsItem.iid
+        }
+      })
     }
   }
 }
