@@ -9,6 +9,12 @@ export function getDetail(iid){
     })
 }
 
+export function getRecommend() {
+  return request({
+    url: '/recommend'
+  })
+}
+
 /**
  * 商品类。数据整合放一个对象里，传到页面展示
  */

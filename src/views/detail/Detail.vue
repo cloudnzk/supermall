@@ -7,6 +7,8 @@
             <detail-shop-info :shop="shop"></detail-shop-info>
             <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
             <detail-param-info :param-info="paramInfo"></detail-param-info>
+            <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
+            <good-list :goods="recommends"></good-list>
         </scroll>
     </div>
 </template>
@@ -17,10 +19,14 @@ import DetailBaseInfo from './childComps/DetailBaseInfo'
 import DetailShopInfo from './childComps/DetailShopInfo'
 import DetailGoodsInfo from './childComps/DetailGoodsInfo'
 import DetailParamInfo from './childComps/DetailParamInfo'
+import DetailCommentInfo from './childComps/DetailCommentInfo'
+
+import GoodList from 'components/content/goods/GoodsList'
 
 import Scroll from 'components/common/scroll/Scroll'
 
-import {getDetail,Goods,Shop,GoodsParam} from 'network/detail'
+import {itemListenerMixin} from 'common/mixin'
+import {getDetail,Goods,Shop,GoodsParam,getRecommend} from 'network/detail'
 export default {
   name: "Detail",
   components: {
@@ -30,8 +36,12 @@ export default {
       DetailShopInfo,
       Scroll,
       DetailGoodsInfo,
-      DetailParamInfo
+      DetailParamInfo,
+      DetailCommentInfo,
+      GoodList
   },
+  // mixins：混入，便于功能复用。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
+  mixins: [itemListenerMixin],
   data () {
    return {
        iid: null,
@@ -40,6 +50,8 @@ export default {
        shop: {},
        detailInfo: {},
        paramInfo: {},
+       commentInfo: {},
+       recommends: [],
    }
   },
   created(){
@@ -66,13 +78,29 @@ export default {
         
         // 5.获取商品的参数信息
         this.paramInfo = new GoodsParam(data.itemParams.info,data.itemParams.rule)
+        
+        // 6.获取评论信息
+        if (data.rate.list){
+            this.commentInfo = data.rate.list[0]
+        }
+      })
+      
+      getRecommend().then(res => {
+          this.recommends = res.data.data.list
       })
   },
   methods:{
       imageLoad(){
           this.$refs.scroll.refresh()
       }
-  }
+  },
+  mounted() {
+    //   console.log('hhh')
+  },
+  // 为什么这里不能在deactivated里取消事件？因为详情页没有缓存，方法无效
+  destroyed() {
+      this.$bus.$off('itemImageLoad',this.itemImgListener)
+  },
 }
 </script>
 <style scoped>
