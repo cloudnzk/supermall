@@ -2,7 +2,7 @@
   <div id="cart">
     <nav-bar class="nav-bar"><div slot="center">购物车({{cartCount}})</div></nav-bar>
     <cart-list class="cart-list" :cart-list="cartList"></cart-list>
-    <bottom-bar></bottom-bar>
+    <!-- <bottom-bar></bottom-bar> -->
   </div>
 </template>
 
@@ -10,6 +10,8 @@
   import NavBar from 'common/navbar/NavBar'
   import CartList from './childComps/CartList'
   import BottomBar from './childComps/BottomBar'
+
+  import { mapGetters } from 'vuex'
 
 	export default {
 		name: "Cart",
@@ -19,19 +21,24 @@
       BottomBar
     },
     computed: {
-		  cartList() {
-		    return this.$store.getters.cartList
-      },
-      cartCount() {
-		    return this.$store.getters.cartLength
-      }
+      //将 store 中的 getter 映射到局部计算属性：
+      ...mapGetters({
+        cartList: 'cartList',
+        cartCount: 'cartLength'
+      }),
+		  // cartList() {
+		  //   return this.$store.getters.cartList
+      // },
+      // cartCount() {
+		  //   return this.$store.getters.cartLength
+      // }
     }
 	}
 </script>
 
 <style scoped>
   #cart {
-    /*position: relative;*/
+    /* position: relative; */
     height: 100vh;
   }
 
