@@ -29,7 +29,7 @@
     },
     methods: {
       imgLoad(){
-        // 等图片都加载完了，进行一次回调即可
+        // 等图片都加载完了，进行一次回调即可。或者在Detail组件中用防抖函数也可
         if(++this.counter === this.imagesLength){
           this.$emit('imageLoad')
         }

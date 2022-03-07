@@ -12,7 +12,7 @@
         v-for="(item, index) in titleInfos"
         :key="index"
         :class="{ active: index === currentIndex }"
-        @click="itemClick(index)"
+        @click="titleClick(index)"
       >
         {{ item }}
       </span>
@@ -46,9 +46,10 @@ export default {
     // },
   },
   methods: {
-    itemClick: function (index) {
+    titleClick: function (index) {
     //   this.$emit("itemClick", index);
         this.currentIndex = index
+        this.$emit('titleClick',index)
     },
     backClick() {
       this.$router.back();

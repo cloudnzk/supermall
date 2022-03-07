@@ -1,14 +1,17 @@
 <template>
     <div id="detail">
-        <detail-nav-bar class="detail-nav"></detail-nav-bar>
-        <scroll class="content" ref="scroll">
+        <detail-nav-bar class="detail-nav" @titleClick="titleClick" ref="nav"></detail-nav-bar>
+        <scroll class="content" 
+        ref="scroll" 
+        @scroll="contentScroll"
+        :probe-type="3">
             <detail-swiper :top-images="topImages"></detail-swiper>
             <detail-base-info :goods="goods"></detail-base-info>
             <detail-shop-info :shop="shop"></detail-shop-info>
             <detail-goods-info :detail-info="detailInfo" @imageLoad="imageLoad"></detail-goods-info>
-            <detail-param-info :param-info="paramInfo"></detail-param-info>
-            <detail-comment-info :comment-info="commentInfo"></detail-comment-info>
-            <good-list :goods="recommends"></good-list>
+            <detail-param-info ref="params" :param-info="paramInfo"></detail-param-info>
+            <detail-comment-info ref="comment" :comment-info="commentInfo"></detail-comment-info>
+            <good-list ref="recommend" :goods="recommends"></good-list>
         </scroll>
     </div>
 </template>
@@ -25,6 +28,7 @@ import GoodList from 'components/content/goods/GoodsList'
 
 import Scroll from 'components/common/scroll/Scroll'
 
+import {debounce} from 'common/utils'
 import {itemListenerMixin} from 'common/mixin'
 import {getDetail,Goods,Shop,GoodsParam,getRecommend} from 'network/detail'
 export default {
@@ -38,7 +42,8 @@ export default {
       DetailGoodsInfo,
       DetailParamInfo,
       DetailCommentInfo,
-      GoodList
+      GoodList,
+      currentIndex: 0,
   },
   // mixins：混入，便于功能复用。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
   mixins: [itemListenerMixin],
@@ -52,6 +57,8 @@ export default {
        paramInfo: {},
        commentInfo: {},
        recommends: [],
+       themeTopYs: [],
+       getThemeTopY: null,
    }
   },
   created(){
@@ -83,19 +90,80 @@ export default {
         if (data.rate.list){
             this.commentInfo = data.rate.list[0]
         }
+        
+        // 第一次获取，值不对
+        // 原因：this.$refs.params.$el没有渲染
+        /*
+        this.themeTopYs = []
+        this.themeTopYs.push(0)
+        this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+        this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+        console.log(this.themeTopYs);
+        */
+
+        // 第二次获取，值不对
+        // 等到页面渲染完，会回调这个函数
+        // 根据最新的数据，对应的DOM是已经被渲染出来了
+        // 但是图片依然没有加载完（目前的offsetTop不包括图片)
+        /*
+        this.$nextTick(() => {
+             //获取每个部分的offsetTop，并设置滚动距离
+            this.themeTopYs = []
+            this.themeTopYs.push(0)
+            this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+            this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+            this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+            console.log(this.themeTopYs);
+        })
+        */
       })
       
       getRecommend().then(res => {
           this.recommends = res.data.data.list
       })
+      
+      // 对getThemeTopY赋值，进行防抖
+      this.getThemeTopY = debounce(() => {
+          this.themeTopYs = []
+          this.themeTopYs.push(0)
+          this.themeTopYs.push(this.$refs.params.$el.offsetTop)
+          this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
+          this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
+          
+        //   console.log(this.themeTopYs);
+      },100)
   },
   methods:{
       imageLoad(){
           this.$refs.scroll.refresh()
+          
+          this.getThemeTopY()
+      },
+      titleClick(index){
+          this.$refs.scroll.scrollTo(0,-this.themeTopYs[index],100)
+      },
+      contentScroll(position){
+          // 1.获取y值
+          const positionY = -position.y
+          
+          // 2.positionY和主题中值进行对比
+          let length = this.themeTopYs.length
+          for(let i = 0; i < length; i++){
+              if(this.currentIndex !== i && (i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1]) || (i === length - 1 && positionY >= this.themeTopYs[i])){
+                console.log(i);
+                this.currentIndex = i;
+                //传到NavBar组件中
+                this.$refs.nav.currentIndex = this.currentIndex
+              }
+          }
       }
   },
   mounted() {
-    //   console.log('hhh')
+    
+  },
+  updated(){
+
   },
   // 为什么这里不能在deactivated里取消事件？因为详情页没有缓存，方法无效
   destroyed() {
@@ -122,5 +190,9 @@ export default {
         /* 设置滚动区域的高度，这里的100%是父元素的高度，所以要指定一个具体的父元素高度 */
         /* calc内要加空格，才能生效 */
         height: calc(100% - 44px); 
+        /* 设置一个定位，才能让子元素的offsetTop获取正常 */
+        position: absolute;
+        top: 44px;
+        bottom: 0;
     }
 </style>
