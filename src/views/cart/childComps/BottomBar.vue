@@ -1,9 +1,9 @@
 <template>
   <div class="bottom-menu">
-    <CheckButton class="select-all" @checkBtnClick="checkBtnClick" v-model="isSelectAll"></CheckButton>
+    <CheckButton class="select-all" @checkBtnClick="checkBtnClick" v-model="isSelectAll" :is-checked="isSelectAll"></CheckButton>
     <span>全选</span>
     <span class="total-price">合计: ¥{{totalPrice}}</span>
-    <span class="buy-product">去计算({{$store.getters.cartCount}})</span>
+    <span class="buy-product">去计算({{$store.getters.cartLength}})</span>
   </div>
 </template>
 
@@ -16,31 +16,32 @@
 		  CheckButton
     },
     computed: {
+      // 计算总价格。计算属性是响应式的，所以取消选中可以实时更新总价格
 		  totalPrice() {
         const cartList = this.$store.getters.cartList;
         return cartList.filter(item => {
           return item.checked
-        }).reduce((preValue, item) => {
-          return preValue + item.count * item.newPrice
+        }).reduce((preValue, item) => { //累加器
+          return preValue + item.count * item.price
         }, 0).toFixed(2)
       },
       isSelectAll: function () {
+        if(this.$store.getters.cartLength === 0)  return false
         return this.$store.getters.cartList.find(item => item.checked === false) === undefined;
       }
     },
     methods: {
       checkBtnClick: function () {
-        // 1.判断是否有未选中的按钮
-        let isSelectAll = this.$store.getters.cartList.find(item => !item.checked);
-
-        // 2.有未选中的内容, 则全部选中
-        if (isSelectAll) {
-          this.$store.state.cartList.forEach(item => {
-            item.checked = true;
-          });
-        } else {
+        
+        // 2.如果有未选中的内容, 则全部选中
+        if (this.isSelectAll) { //全部选中
           this.$store.state.cartList.forEach(item => {
             item.checked = false;
+          });
+        } 
+        else { //部分选中
+          this.$store.state.cartList.forEach(item => {
+            item.checked = true;
           });
         }
       }
@@ -54,8 +55,9 @@
     height: 44px;
     background-color: #eee;
     position: fixed;
-    bottom: 50px;
+    bottom: 49px;
     left: 0;
+    right: 0;
     box-shadow: 0 -2px 3px rgba(0, 0, 0, .2);
     font-size: 14px;
     color: #888;
