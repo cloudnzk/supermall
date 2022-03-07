@@ -1,6 +1,6 @@
 <template>
     <div class="cart-list">
-      <scroll class="content">
+      <scroll class="content" ref="scroll">
           <cart-list-item v-for="item in cartList" :key="item.iid" :item-info="item"></cart-list-item>
       </scroll>
     </div>
@@ -22,6 +22,10 @@
 		      return []
         }
       }
+    },
+    activated(){
+      // 不能滚动的原因主要是高度没刷新
+      this.$refs.scroll.refresh()
     }
 	}
 </script>

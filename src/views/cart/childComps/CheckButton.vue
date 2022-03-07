@@ -13,7 +13,11 @@
 		  value: {
 		    type: Boolean,
         default: true
-      }
+      },
+      // isChecked: {
+		  //   type: Boolean,
+      //   default: true
+      // }
     },
     data: function () {
 		  return {
