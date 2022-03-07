@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import mutations from './mutations'
 import actions from './actions'
+import getters from './getters'
 
 // 1.安装插件
 Vue.use(Vuex)
@@ -17,6 +18,7 @@ const store = new Vuex.Store({
     // mutations中的每个方法尽可能完成的事件单一一点
     mutations,
     actions,
+    getters,
 })
 
 // 3.导出，挂载Vue实例上

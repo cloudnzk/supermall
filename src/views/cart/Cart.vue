@@ -23,7 +23,7 @@
 		    return this.$store.getters.cartList
       },
       cartCount() {
-		    return this.$store.getters.cartCount
+		    return this.$store.getters.cartLength
       }
     }
 	}
