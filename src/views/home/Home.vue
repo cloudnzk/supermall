@@ -26,7 +26,7 @@
     </scroll>
     <!-- 为什么这里需要用到.native修饰符？ 
         因为需要监听一个组件的原生事件时，必须加上才能监听-->
-    <back-top @click.native="backClick" v-show="isShowBackTop"/>
+    <back-top @click.native="backTop" v-show="isShowBackTop"/>
   </div>
 </template>
 
@@ -36,7 +36,6 @@
 
   import TabControl from 'components/content/tabControl/TabControl'
   import GoodsList from 'components/content/goods/GoodsList'
-  import BackTop from 'components/content/backTop/BackTop'
   
   import HomeSwiper from './childComps/HomeSwiper'
   import RecommendView from './childComps/RecommendView'
@@ -44,7 +43,7 @@
 
 
   import {getHomeMultidata,getHomeGoods} from 'network/home'
-  import {itemListenerMixin} from 'common/mixin'
+  import {itemListenerMixin,backTopMixin} from 'common/mixin'
   
   export default {
     name: "Home",
@@ -56,9 +55,8 @@
       TabControl,
       GoodsList,
       Scroll,
-      BackTop
     },
-    mixins: [itemListenerMixin],
+    mixins: [itemListenerMixin,backTopMixin],
     data() {
 
       return {
@@ -71,7 +69,6 @@
           'sell': {page: 0, list: []},
         },
         currentType: 'pop',
-        isShowBackTop: true,
         tabOffsetTop: 0,
         isTabFixed: false,
         saveY: 0,
@@ -129,16 +126,13 @@
         this.$refs.tabControl1.currentIndex = index
         this.$refs.tabControl2.currentIndex = index
       },
-
-      backClick(){
-        this.$refs.scroll.scrollTo(0,0)
-      },
       
       /* 监听滚动 */
       contentScroll(position){
         // console.log(position);
         // 判断BackTop是否显示
-        this.isShowBackTop = -position.y > 1000
+        // this.isShowBackTop = -position.y > 1000
+        this.listenShowBackTop(position)
         
         // 决定tabControl是否吸顶
         this.isTabFixed = -position.y > this.tabOffsetTop

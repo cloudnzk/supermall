@@ -13,6 +13,8 @@
             <detail-comment-info ref="comment" :comment-info="commentInfo"></detail-comment-info>
             <good-list ref="recommend" :goods="recommends"></good-list>
         </scroll>
+        <back-top @click.native="backTop" v-show="isShowBackTop"/>
+        <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
     </div>
 </template>
 <script>
@@ -23,13 +25,14 @@ import DetailShopInfo from './childComps/DetailShopInfo'
 import DetailGoodsInfo from './childComps/DetailGoodsInfo'
 import DetailParamInfo from './childComps/DetailParamInfo'
 import DetailCommentInfo from './childComps/DetailCommentInfo'
+import DetailBottomBar from './childComps/DetailBottomBar'
 
 import GoodList from 'components/content/goods/GoodsList'
 
 import Scroll from 'components/common/scroll/Scroll'
 
 import {debounce} from 'common/utils'
-import {itemListenerMixin} from 'common/mixin'
+import {itemListenerMixin,backTopMixin} from 'common/mixin'
 import {getDetail,Goods,Shop,GoodsParam,getRecommend} from 'network/detail'
 export default {
   name: "Detail",
@@ -43,10 +46,10 @@ export default {
       DetailParamInfo,
       DetailCommentInfo,
       GoodList,
-      currentIndex: 0,
+      DetailBottomBar,
   },
   // mixins：混入，便于功能复用。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin,backTopMixin],
   data () {
    return {
        iid: null,
@@ -59,6 +62,7 @@ export default {
        recommends: [],
        themeTopYs: [],
        getThemeTopY: null,
+       currentIndex: 0,
    }
   },
   created(){
@@ -130,7 +134,7 @@ export default {
           this.themeTopYs.push(this.$refs.params.$el.offsetTop)
           this.themeTopYs.push(this.$refs.comment.$el.offsetTop)
           this.themeTopYs.push(this.$refs.recommend.$el.offsetTop)
-          
+          this.themeTopYs.push(Number.MAX_VALUE)
         //   console.log(this.themeTopYs);
       },100)
   },
@@ -150,13 +154,32 @@ export default {
           // 2.positionY和主题中值进行对比
           let length = this.themeTopYs.length
           for(let i = 0; i < length; i++){
-              if(this.currentIndex !== i && (i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1]) || (i === length - 1 && positionY >= this.themeTopYs[i])){
-                console.log(i);
-                this.currentIndex = i;
-                //传到NavBar组件中
-                this.$refs.nav.currentIndex = this.currentIndex
+              // 条件一：防止赋值的过程过于频繁；条件二：判断区间
+              // if(this.currentIndex !== i && (i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1]) || (i === length - 1 && positionY >= this.themeTopYs[i])){
+                  // 简化判断，在数组多添加一个大的数，避免数组越界
+                if(this.currentIndex !== i && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1]){
+                    // console.log(i);
+                    this.currentIndex = i;
+                    //传到NavBar组件中
+                    this.$refs.nav.currentIndex = this.currentIndex
               }
           }
+
+          // 3.返回顶部显示
+          this.listenShowBackTop(position)
+      },
+      addToCart(){
+          // 1.获取购物车需要展示的信息
+          const product = {}
+          product.image = this.topImages[0]
+          product.title = this.goods.title
+          product.desc = this.goods.desc
+          product.price = this.goods.nowPrice
+          product.iid = this.iid;
+          
+          // 2.将商品添加到购物车里面，用Vuex
+          // this.$store.commit('addCart',product)
+          this.$store.dispatch('addCart',product)
       }
   },
   mounted() {
@@ -189,10 +212,10 @@ export default {
     .content {
         /* 设置滚动区域的高度，这里的100%是父元素的高度，所以要指定一个具体的父元素高度 */
         /* calc内要加空格，才能生效 */
-        height: calc(100% - 44px); 
+        /* height: calc(100% - 44px);  */
         /* 设置一个定位，才能让子元素的offsetTop获取正常 */
         position: absolute;
         top: 44px;
-        bottom: 0;
+        bottom: 58px;
     }
 </style>
