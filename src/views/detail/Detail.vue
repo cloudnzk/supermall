@@ -15,6 +15,7 @@
         </scroll>
         <back-top @click.native="backTop" v-show="isShowBackTop"/>
         <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
+        <!-- <toast :message="message" :is-show="isShow"/> -->
     </div>
 </template>
 <script>
@@ -30,10 +31,14 @@ import DetailBottomBar from './childComps/DetailBottomBar'
 import GoodList from 'components/content/goods/GoodsList'
 
 import Scroll from 'components/common/scroll/Scroll'
+// import Toast from 'components/common/toast/Toast'
 
 import {debounce} from 'common/utils'
 import {itemListenerMixin,backTopMixin} from 'common/mixin'
 import {getDetail,Goods,Shop,GoodsParam,getRecommend} from 'network/detail'
+
+import {mapActions} from 'vuex'
+
 export default {
   name: "Detail",
   components: {
@@ -47,6 +52,7 @@ export default {
       DetailCommentInfo,
       GoodList,
       DetailBottomBar,
+    //   Toast
   },
   // mixins：混入，便于功能复用。当组件使用混入对象时，所有混入对象的选项将被“混合”进入该组件本身的选项。
   mixins: [itemListenerMixin,backTopMixin],
@@ -63,7 +69,12 @@ export default {
        themeTopYs: [],
        getThemeTopY: null,
        currentIndex: 0,
+    //    message: '',
+    //    isShow: false
    }
+  },
+  computed: {
+      
   },
   created(){
       // 1.保存传入的iid，因为是用query传参，所以要用this.$route.query取出内容
@@ -139,6 +150,8 @@ export default {
       },100)
   },
   methods:{
+      ...mapActions(['addCart',
+      ]),
       imageLoad(){
           this.$refs.scroll.refresh()
           
@@ -179,7 +192,19 @@ export default {
           
           // 2.将商品添加到购物车里面，用Vuex
           // this.$store.commit('addCart',product)
-          this.$store.dispatch('addCart',product)
+          this.addCart(product).then(res => {
+            //   this.isShow = true
+            //   this.message = res
+              
+            //   setTimeout(() => {
+            //       this.isShow = false;
+            //       this.message = ''
+            //   }, 1500);
+            this.$toast.show(res,1500)
+          })
+        //   this.$store.dispatch('addCart',product).then(res =>{
+        //       console.log(res);
+        //   })
       }
   },
   mounted() {

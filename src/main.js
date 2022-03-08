@@ -3,6 +3,8 @@ import App from './App.vue'
 import router from "@/router";
 import store from "@/store"
 
+import toast from 'components/common/toast'
+
 Vue.config.productionTip = false
 
 /* 怎么应对非父子组件通信问题
@@ -10,6 +12,9 @@ Vue.config.productionTip = false
 *  创建一个空的实例，全局定义
 */
 Vue.prototype.$bus = new Vue()
+
+// 安装toast插件
+Vue.use(toast)
 
 new Vue({
   render: h => h(App),
