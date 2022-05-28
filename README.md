@@ -1,4 +1,4 @@
-# tabbar
+# supermall
 
 ## Project setup
 ```
